@@ -1,0 +1,23 @@
+u3 = "https://github.com/U-Shift/cyclingpotential-hack/releases/download/2.0.0/routes_fast.geojson"
+routes = sf::read_sf(u3)
+
+routes_impedance <- routes %>% 
+  mutate(impedance = case_when(distances < 10 ~ 0,
+                               gradient_segment > 0.11 & distances > 15 ~ 1,
+                               gradient_segment > 0.11 & distances <= 15 ~ distances/15,
+                               gradient_segment > 0.10 & gradient_segment <= 0.11 & distances > 30 ~ 1,
+                               gradient_segment > 0.10 & gradient_segment <= 0.11 & distances <= 30 ~ distances/30,
+                               gradient_segment > 0.09 & gradient_segment <= 0.10 & distances > 60 ~ 1,
+                               gradient_segment > 0.09 & gradient_segment <= 0.10 & distances <= 60 ~ distances/60,
+                               gradient_segment > 0.08 & gradient_segment <= 0.09 & distances > 90 ~ 1,
+                               gradient_segment > 0.08 & gradient_segment <= 0.09 & distances <= 90 ~ distances/90,
+                               gradient_segment > 0.07 & gradient_segment <= 0.08 & distances > 120 ~ 1,
+                               gradient_segment > 0.07 & gradient_segment <= 0.08 & distances <= 120 ~ distances/120,
+                               gradient_segment > 0.06 & gradient_segment <= 0.07 & distances > 240 ~ 1,
+                               gradient_segment > 0.06 & gradient_segment <= 0.07 & distances <= 240 ~ distances/240,
+                               gradient_segment <= 0.06 & distances > 2000 ~ 1,
+                               gradient_segment <= 0.06 & distances <= 2000 ~ distances/2000,
+                               TRUE ~ 0))
+
+tm_shape(routes_impedance) +
+  tm_lines("impedance", palette = "viridis")
